@@ -5,13 +5,16 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:p2p_chat/src/business_logic/models/peers_data.dart';
+import 'package:sdp_transform/sdp_transform.dart';
 
 part 'web_rtc_event.dart';
 part 'web_rtc_state.dart';
 
 class WebRtcBloc extends Bloc<WebRtcEvent, WebRtcState> {
-  var localRenderer = new RTCVideoRenderer();
-  var remoteRenderer = new RTCVideoRenderer();
+  var _isOffer = false;
+  RTCPeerConnection _peerConnection;
+  var _localRenderer = new RTCVideoRenderer();
+  var _remoteRenderer = new RTCVideoRenderer();
 
   WebRtcBloc(WebRtcState initialState) : super(initialState);
 
@@ -21,15 +24,18 @@ class WebRtcBloc extends Bloc<WebRtcEvent, WebRtcState> {
   ) async* {
     if (event is InitPeerConnection) {
       yield WebRtcLoading();
-      localRenderer.initialize();
-      remoteRenderer.initialize();
-      final peerConnection = await _createPeerConnection();
+      _localRenderer.initialize();
+      _remoteRenderer.initialize();
+      _peerConnection = await _createPeerConnection();
+
       final peersData = new PeersData(
-        peerConnection: peerConnection,
-        localRenderer: localRenderer,
-        remoteRenderer: remoteRenderer,
+        isOffer: _isOffer,
+        peerConnection: _peerConnection,
+        localRenderer: _localRenderer,
+        remoteRenderer: _remoteRenderer,
       );
       yield WebRtcLoaded(peersData);
+      _createOffer();
     }
   }
 
@@ -52,7 +58,7 @@ class WebRtcBloc extends Bloc<WebRtcEvent, WebRtcState> {
         await createPeerConnection(configuration, offerSdpConstraints);
 
     MediaStream localStream = await _getUserMedia();
-    localRenderer.srcObject = localStream;
+    _localRenderer.srcObject = localStream;
     pc.addStream(localStream);
 
     // Get and print Ice Candidates when generating sdp offer.
@@ -73,7 +79,7 @@ class WebRtcBloc extends Bloc<WebRtcEvent, WebRtcState> {
     // Receive remote stream (video) from peer.
     pc.onAddStream = (stream) {
       print('addStream: ' + stream.id);
-      remoteRenderer.srcObject = stream;
+      _remoteRenderer.srcObject = stream;
     };
 
     return pc;
@@ -91,5 +97,19 @@ class WebRtcBloc extends Bloc<WebRtcEvent, WebRtcState> {
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
     return localStream;
+  }
+
+  void _createOffer() async {
+    RTCSessionDescription description =
+        await _peerConnection.createOffer({'offerToReceiveVideo': 1});
+
+    var session = parse(description.sdp);
+    print(session);
+    print("HELLO FRIENDSSS\n\n\n\n\n");
+    print(session);
+    // print(json.encode(session));
+    _isOffer = true;
+
+    _peerConnection.setLocalDescription(description);
   }
 }

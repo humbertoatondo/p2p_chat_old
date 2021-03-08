@@ -34,14 +34,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
 
-  SizedBox videoRenderers() => SizedBox(
+  SizedBox videoRenderers(state) => SizedBox(
         height: 350,
         child: Row(
           children: [
             Flexible(
               child: Container(
                 child: RTCVideoView(
-                  webRtcBloc.localRenderer,
+                  state.peersData.localRenderer,
                   mirror: true,
                 ),
                 key: Key('local'),
@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Flexible(
               child: Container(
-                child: RTCVideoView(webRtcBloc.remoteRenderer),
+                child: RTCVideoView(state.peersData.remoteRenderer),
                 key: Key('remote'),
                 margin: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
                 decoration: BoxDecoration(color: Colors.black),
