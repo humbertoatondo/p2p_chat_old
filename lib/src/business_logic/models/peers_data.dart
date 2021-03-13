@@ -7,12 +7,16 @@ class PeersData extends Equatable {
   final RTCPeerConnection peerConnection;
   final RTCVideoRenderer localRenderer;
   final RTCVideoRenderer remoteRenderer;
+  final String sdpOffer;
+  final List<dynamic> candidate;
 
   PeersData({
     @required this.isOffer,
     @required this.peerConnection,
     @required this.localRenderer,
     @required this.remoteRenderer,
+    @required this.sdpOffer,
+    @required this.candidate,
   });
 
   @override
@@ -21,5 +25,7 @@ class PeersData extends Equatable {
         peerConnection,
         localRenderer,
         remoteRenderer,
+        sdpOffer,
+        candidate,
       ];
 }

@@ -29,6 +29,8 @@ dependencies:
   equatable: ^1.2.5
   flutter_webrtc: ^0.5.8
   sdp_transform: ^0.2.0
+  web_socket_channel: ^2.0.0
+  ansicolor: ^1.1.1
 
 dev_dependencies:
   flutter_test:

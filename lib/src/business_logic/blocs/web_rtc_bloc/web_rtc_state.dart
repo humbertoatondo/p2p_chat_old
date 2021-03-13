@@ -1,19 +1,23 @@
 part of 'web_rtc_bloc.dart';
 
-abstract class WebRtcState extends Equatable {
-  const WebRtcState([Object list]);
+abstract class VideoConnectionState extends Equatable {
+  const VideoConnectionState([Object list]);
 
   @override
   List<Object> get props => [];
 }
 
-class WebRtcInitial extends WebRtcState {}
+class VideoConnectionInitial extends VideoConnectionState {}
 
-class WebRtcLoading extends WebRtcState {}
-
-class WebRtcLoaded extends WebRtcState {
+class VideoConnectionOfferSent extends VideoConnectionState {
   // final RTCPeerConnection peerConnection;
   final PeersData peersData;
 
-  WebRtcLoaded(this.peersData) : super([peersData]);
+  VideoConnectionOfferSent(this.peersData) : super([peersData]);
+}
+
+class VideoConnectionEstablished extends VideoConnectionState {
+  final PeersData peersData;
+
+  VideoConnectionEstablished(this.peersData) : super([peersData]);
 }

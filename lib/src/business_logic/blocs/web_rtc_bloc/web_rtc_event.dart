@@ -7,6 +7,16 @@ abstract class WebRtcEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class InitPeerConnection extends WebRtcEvent {
-  InitPeerConnection() : super([]);
+class SendOffer extends WebRtcEvent {
+  bool isOffer;
+  dynamic remoteOffer;
+  SendOffer(this.isOffer, this.remoteOffer) : super([isOffer, remoteOffer]);
+}
+
+class ReceiveOffer extends WebRtcEvent {
+  String remoteOffer;
+  List<dynamic> remoteCandidates;
+  bool isOffer;
+  ReceiveOffer(this.remoteOffer, this.remoteCandidates, this.isOffer)
+      : super([remoteOffer, remoteCandidates, isOffer]);
 }
