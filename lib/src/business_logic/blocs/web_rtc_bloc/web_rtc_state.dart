@@ -9,15 +9,31 @@ abstract class VideoConnectionState extends Equatable {
 
 class VideoConnectionInitial extends VideoConnectionState {}
 
-class VideoConnectionOfferSent extends VideoConnectionState {
-  // final RTCPeerConnection peerConnection;
-  final PeersData peersData;
+class VideoConnectionWaitingForAnswer extends VideoConnectionState {
+  VideoConnectionWaitingForAnswer() : super();
+}
 
-  VideoConnectionOfferSent(this.peersData) : super([peersData]);
+class VideoConnectionWaitingForIceCandidates extends VideoConnectionState {
+  VideoConnectionWaitingForIceCandidates() : super();
+}
+
+class VideoConnectionWaitingForStatus extends VideoConnectionState {
+  VideoConnectionWaitingForStatus() : super();
 }
 
 class VideoConnectionEstablished extends VideoConnectionState {
-  final PeersData peersData;
-
-  VideoConnectionEstablished(this.peersData) : super([peersData]);
+  VideoConnectionEstablished() : super() {
+    var logger = Logger(
+      printer: PrettyPrinter(
+          methodCount: 0, // number of method calls to be displayed
+          errorMethodCount:
+              8, // number of method calls if stacktrace is provided
+          lineLength: 90, // width of the output
+          colors: true, // Colorful log messages
+          printEmojis: true, // Print an emoji for each log message
+          printTime: true // Should each log print contain a timestamp
+          ),
+    );
+    logger.i("Successfull video connection!");
+  }
 }

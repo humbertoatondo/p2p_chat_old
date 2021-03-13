@@ -6,7 +6,6 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:p2p_chat/src/business_logic/blocs/web_rtc_bloc/web_rtc_bloc.dart';
 import 'package:p2p_chat/src/views/utils/buttons.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:ansicolor/ansicolor.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -18,23 +17,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final channel =
-      new WebSocketChannel.connect(Uri.parse("ws://localhost:3000/connection"));
+  final channel = new WebSocketChannel.connect(
+      Uri.parse("ws://192.168.1.89:3000/connection"));
 
   final webRtcBloc = WebRtcBloc(VideoConnectionInitial());
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     channel.stream.listen((message) {
-      var answer = json.decode(message);
+      var data = json.decode(message);
 
-      if (webRtcBloc.state is VideoConnectionOfferSent) {
-        webRtcBloc
-            .add(ReceiveOffer(answer["sdpOffer"], answer["candidate"], true));
-      } else if (webRtcBloc.state is VideoConnectionInitial) {
-        webRtcBloc.add(SendOffer(false, answer));
+      if (webRtcBloc.state is VideoConnectionInitial) {
+        webRtcBloc.add(ReceiveOffer(data["offer"]));
+      } else if (webRtcBloc.state is VideoConnectionWaitingForAnswer) {
+        webRtcBloc.add(ReceiveAnswer(data["answer"]));
+      } else if (webRtcBloc.state is VideoConnectionWaitingForIceCandidates) {
+        webRtcBloc.add(ReceiveIceCandidates(data["candidates"]));
+      } else if (webRtcBloc.state is VideoConnectionWaitingForStatus) {
+        webRtcBloc.add(ReceiveConnectionStatus(data["status"]));
       }
     });
   }
@@ -98,37 +99,27 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Center(
           child: Column(
             children: [
-              videoRenderers(),
               BlocBuilder(
                   cubit: webRtcBloc,
                   builder: (BuildContext context, VideoConnectionState state) {
-                    if (state is VideoConnectionOfferSent) {
-                      final offer = {
-                        "isOffer": true,
-                        "sdpOffer": state.peersData.sdpOffer,
-                        "candidate": state.peersData.candidate,
-                      };
-                      channel.sink.add(json.encode(offer));
-                      // return videoRenderers(state);
-                      // return videoRenderers(state);
+                    if (state is VideoConnectionWaitingForAnswer) {
+                      channel.sink
+                          .add(json.encode({"offer": webRtcBloc.offer}));
+                      return Container();
+                    } else if (state
+                        is VideoConnectionWaitingForIceCandidates) {
+                      channel.sink
+                          .add(json.encode({"answer": webRtcBloc.answer}));
+                      return Container();
+                    } else if (state is VideoConnectionWaitingForStatus) {
+                      channel.sink.add(
+                          json.encode({"candidates": webRtcBloc.candidates}));
                       return Container();
                     } else if (state is VideoConnectionEstablished) {
-                      // print("\n\n\n\n\nESTABLISHED\n\n\n\n\n");
-
-                      if (!state.peersData.isOffer) {
-                        final offer = {
-                          "isOffer": false,
-                          "sdpOffer": state.peersData.sdpOffer,
-                          "candidate": state.peersData.candidate,
-                        };
-                        channel.sink.add(json.encode(offer));
-                      }
-
-                      return Container();
-                      // return videoRenderers(state);
-                    } else {
-                      return Container();
+                      channel.sink.add(json.encode({"status": 1}));
+                      return videoRenderers();
                     }
+                    return Container();
                   }),
               Expanded(
                 child: Container(),
@@ -144,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       backgroundColor: Colors.amber,
                       onPressed: () {
                         if (webRtcBloc.state is VideoConnectionInitial) {
-                          webRtcBloc.add(SendOffer(true, null));
+                          webRtcBloc.add(SendOffer());
                         }
                       },
                     ),

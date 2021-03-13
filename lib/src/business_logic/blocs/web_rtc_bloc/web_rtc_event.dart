@@ -8,15 +8,25 @@ abstract class WebRtcEvent extends Equatable {
 }
 
 class SendOffer extends WebRtcEvent {
-  bool isOffer;
-  dynamic remoteOffer;
-  SendOffer(this.isOffer, this.remoteOffer) : super([isOffer, remoteOffer]);
+  SendOffer() : super();
 }
 
 class ReceiveOffer extends WebRtcEvent {
-  String remoteOffer;
-  List<dynamic> remoteCandidates;
-  bool isOffer;
-  ReceiveOffer(this.remoteOffer, this.remoteCandidates, this.isOffer)
-      : super([remoteOffer, remoteCandidates, isOffer]);
+  final String remoteOffer;
+  ReceiveOffer(this.remoteOffer) : super([remoteOffer]);
+}
+
+class ReceiveAnswer extends WebRtcEvent {
+  final String remoteAnswer;
+  ReceiveAnswer(this.remoteAnswer) : super([remoteAnswer]);
+}
+
+class ReceiveIceCandidates extends WebRtcEvent {
+  final List<dynamic> iceCandidates;
+  ReceiveIceCandidates(this.iceCandidates) : super([iceCandidates]);
+}
+
+class ReceiveConnectionStatus extends WebRtcEvent {
+  final int isSuccess;
+  ReceiveConnectionStatus(this.isSuccess) : super([isSuccess]);
 }
