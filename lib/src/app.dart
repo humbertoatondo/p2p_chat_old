@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'package:p2p_chat/src/views/ui/home_page.dart';
+import 'package:p2p_chat/src/routes.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -11,7 +10,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      initialRoute: '/login',
+      onGenerateRoute: Routes.generateRoutes,
     );
   }
 }

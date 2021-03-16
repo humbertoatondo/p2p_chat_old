@@ -7,16 +7,16 @@ import 'package:p2p_chat/src/business_logic/blocs/web_rtc_bloc/web_rtc_bloc.dart
 import 'package:p2p_chat/src/views/utils/buttons.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class VideoView extends StatefulWidget {
+  VideoView({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _VideoViewState createState() => _VideoViewState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _VideoViewState extends State<VideoView> {
   final channel = new WebSocketChannel.connect(
       Uri.parse("ws://192.168.1.89:3000/connection"));
 
